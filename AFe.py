@@ -25,7 +25,6 @@ class AFe :
 
         while estadosPossiveis:
             atual = estadosPossiveis.pop()
-
             #verificando transições vazias a partir do estudo atual
             if(atual,"&") in self.funPrograma:
                 for prox_estado in self.funPrograma[(atual,"&")]:
@@ -38,21 +37,24 @@ class AFe :
 
     def verificaPalavra(self, palavra):
 
-        estadoAtual = self.estadoInicial
+        estadosPossiveis = set(self.fechoVazio(self.estadoInicial))
 
-        estadosAVerificar = [estadoAtual]
+        for letra in palavra:
+            proximosEstados = set()
+            for estado in estadosPossiveis:
+                for estadoDestino in self.funPrograma.get((estado, letra), []):
+                    proximosEstados =  proximosEstados | self.fechoVazio(estadoDestino)
 
-        estadosPercorridos = {}
+            estadosPossiveis = proximosEstados
 
-        while palavra!= "":
-            atual = estadosAVerificar.pop
-            for (atual, palavra[0]) in self.funPrograma:
-                estados
-
-
-
+        return not self.estadosFinais.isdisjoint(estadosPossiveis)
 
 
+#o AFNe quer dizer que vc pode estar em dois estados ao mesmo tempo
+# Isso pq a transição não custa nada
+# Então para ver se uma palavra é aceita, preciso calcular o fecho vazio de cada estado que irei passar e guardar num conjunto de estados possíveis
+# Assim, vou tentando consumir a palavra e recalculando os fechos a cada estado e adicionando ao conjunto de estados possiveis
+# Caso a palavra tenha terminado, verifico se um dos estados possiveis é final
 
 
 
@@ -120,15 +122,17 @@ def _entrar_com_transicao_(setEstados, setAlfabeto):
 
     return transicoes
 
+
 def _entrar_com_estados_finais_(setEstados):
     estadosFinais = input("Digite os estados finais separados por vírgula: ")
-    mapEstadosFinais = map(int, estadosFinais.split(','))
+    mapEstadosFinais = set(map(int, estadosFinais.split(',')))
 
     for i in mapEstadosFinais:
         if i not in setEstados:
             print("Estado final não existe no conjunto de estados. Tente novamente")
-            _entrar_com_estados_finais_(setEstados)
-    return estadosFinais
+            return _entrar_com_estados_finais_(setEstados)  # Chama novamente e retorna o valor correto
+
+    return mapEstadosFinais
 
 
 
@@ -151,12 +155,17 @@ def main():
     print(f"q0: (estado inicial): {automato.getEstadoInicial()}")
     print(f"F: (estados finais): {automato.getEstadosFinais()}")
 
-
-
     for estado in estados:
         fechoVazio = automato.fechoVazio(estado)
         print(f"O fecho vazio do estado {estado} é: {fechoVazio}")
 
+    print(f"Palavra 'aabb': {automato.verificaPalavra('aabb')}")
+    print(f"Palavra 'a': {automato.verificaPalavra('a')}")
+    print(f"Palavra 'b': {automato.verificaPalavra('b')}")
+    print(f"Palavra '&': {automato.verificaPalavra('&')}")
+    print(f"Palavra 'aba': {automato.verificaPalavra('aba')}")
+    print(f"Palavra 'bbab': {automato.verificaPalavra('bbab')}")
+    print(f"Palavra 'ba': {automato.verificaPalavra('ba')}")
 
 
 main()
