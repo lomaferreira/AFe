@@ -1,3 +1,7 @@
+# Disciplina: Linguagens Formais e Autômatos - 2024.2 - UFMA
+# Alunas: Amanda Almeida Cardoso e Paloma Santos Ferreira
+# Fevereiro 2025
+# Implementação de um Automato Finito Não Determinístico com Movimentos Vazios (AFNe)
 
 
 class AFe :
@@ -7,25 +11,16 @@ class AFe :
         self.funPrograma = funPrograma  #dicionario de transições
         self.estadoInicial = estadoInicial
         self.estadosFinais = estadosFinais
-    def getEstados(self):
-        return self.estados
-    def getAlfabeto(self):
-        return self.alfabeto
-    def getFunPrograma(self):
-        return self.funPrograma
-    def getEstadoInicial(self):
-        return self.estadoInicial
-    def getEstadosFinais(self):
-        return self.estadosFinais
 
+    #Calcula o fecho vazio de um estado, retorna o fecho
     def fechoVazio(self, estado):
 
-        fecho = {estado} #o próprio estado faz parte do fecho
+        fecho = {estado} #O próprio estado faz parte do fecho
         estadosPossiveis = [estado]
 
         while estadosPossiveis:
             atual = estadosPossiveis.pop()
-            #verificando transições vazias a partir do estudo atual
+            #Verificando transições vazias a partir do estudo atual
             if(atual,"&") in self.funPrograma:
                 for prox_estado in self.funPrograma[(atual,"&")]:
                     if prox_estado not in fecho:
@@ -35,27 +30,34 @@ class AFe :
 
         return fecho
 
+    #Verifica se a palavra é aceita pelo AFNe
     def verificaPalavra(self, palavra):
 
         estadosPossiveis = set(self.fechoVazio(self.estadoInicial))
 
+        #Verifica quais estados são acessíveis a partir do símbolo lido
+        #Adiciona esses estados no conjunto estados possíveis.
+
         for letra in palavra:
             proximosEstados = set()
             for estado in estadosPossiveis:
-                for estadoDestino in self.funPrograma.get((estado, letra), []):
-                    proximosEstados =  proximosEstados | self.fechoVazio(estadoDestino)
+                for estadoDestino in self.funPrograma.get((estado, letra), []):             #Buscar os estados de destino no dicionário
+                    proximosEstados =  proximosEstados | self.fechoVazio(estadoDestino)     #Insere o fecho vazio do estado de destino no conjunto próximosEstados
 
-            estadosPossiveis = proximosEstados
+            estadosPossiveis = proximosEstados                                              #Atualiza estados possíveis
 
-        return not self.estadosFinais.isdisjoint(estadosPossiveis)
+        return not self.estadosFinais.isdisjoint(estadosPossiveis)                          #Retorna TRUE se existe um estado final no conjunto de estados possíveis
 
 
-#o AFNe quer dizer que vc pode estar em dois estados ao mesmo tempo
-# Isso pq a transição não custa nada
-# Então para ver se uma palavra é aceita, preciso calcular o fecho vazio de cada estado que irei passar e guardar num conjunto de estados possíveis
-# Assim, vou tentando consumir a palavra e recalculando os fechos a cada estado e adicionando ao conjunto de estados possiveis
-# Caso a palavra tenha terminado, verifico se um dos estados possiveis é final
+    #Verifica se o estado inicial também é final
+    #Se for, ele adiciona a transição vazia para o próprio estado.
+    #A palavra vazia "&" é aceita
+    def verificaEstadoFinalEInicial(self):
 
+        if(self.estadoInicial in self.estadosFinais):
+            self.funPrograma[(int(self.estadoInicial), "&")] = {int(self.estadoInicial)}
+            return True
+        return False
 
 
 
@@ -69,7 +71,7 @@ def _entrar_com_estados_():
             return set(mapEstados)
         else:
             print("Valores inválidos, tente novamente")
-            _entrar_com_estados_()
+            return _entrar_com_estados_()
 
 def _entrar_com_alfabeto_():
     alfabeto = input("Digite até 3 símbolos do alfabeto separados por vírgula: ")
@@ -78,7 +80,7 @@ def _entrar_com_alfabeto_():
         return setAlfabeto
     else:
         print("Alfabeto inválido. Tente novamente")
-        _entrar_com_alfabeto_()
+        return _entrar_com_alfabeto_()
 
 def _entrar_com_estado_inicial_(setEstados):
     estadoInicial = int(input("Digite o estado inicial: "))
@@ -86,16 +88,17 @@ def _entrar_com_estado_inicial_(setEstados):
         return estadoInicial
     else:
         print("Estado inical não existe no conjunto de estados. Tente novamente")
-        _entrar_com_estado_inicial_(setEstados)
+        return _entrar_com_estado_inicial_(setEstados)
 
 def _entrar_com_transicao_(setEstados, setAlfabeto):
 
     aux = 0
     transicoes = {}
-    while aux <= 7 :
+    while aux < 7 :
         transicao = input("Digite uma transição. Considere & como epsilon. Digite 'sair' para finalizar ")
         if transicao.lower() == 'sair':
             break
+
         primeiroEstado = int(transicao[0])
         simbolo = transicao[1]
         segundoEstado = int(transicao[2])
@@ -103,20 +106,20 @@ def _entrar_com_transicao_(setEstados, setAlfabeto):
         if  len(transicao) != 3:
             print("Formato incorreto")
             continue
-        if primeiroEstado not in setEstados and not isinstance(primeiroEstado,int):
+        if primeiroEstado not in setEstados or not isinstance(primeiroEstado,int):
             print("Estado inexistente")
             continue
-        if simbolo != "&" and transicao[1] not in setAlfabeto and not isinstance(simbolo, str) :
+        if simbolo != "&" and transicao[1] not in setAlfabeto or not isinstance(simbolo, str) :
             print("Símbolo é inválido")
             continue
-        if segundoEstado not in setEstados and not isinstance(segundoEstado,int):
+        if segundoEstado not in setEstados or not isinstance(segundoEstado,int):
             print("Estado inexistente")
             continue
 
-        if (int(primeiroEstado), simbolo) in transicoes:
-            transicoes[int(primeiroEstado),simbolo].add(int(segundoEstado))
+        if (int(primeiroEstado), simbolo) in transicoes:                        # Se o estado e simbolo já estão no dicionário  (0,"a") = {1, 2, 3}
+            transicoes[int(primeiroEstado),simbolo].add(int(segundoEstado))     # Adiciona o estado final no set
         else:
-            transicoes[(int(primeiroEstado), simbolo)] = {int(segundoEstado)}
+            transicoes[(int(primeiroEstado), simbolo)] = {int(segundoEstado)}   # Cria o set
 
         aux+=1
 
@@ -135,10 +138,9 @@ def _entrar_com_estados_finais_(setEstados):
     return mapEstadosFinais
 
 
-
 def main():
 
-    print("Criando AFe \n")
+    print("\n\n### Criando AFNe ###\n")
 
     alfabeto = _entrar_com_alfabeto_()
     estados = _entrar_com_estados_()
@@ -147,26 +149,28 @@ def main():
     estadosFinais = _entrar_com_estados_finais_(estados)
 
     automato = AFe(estados,alfabeto,estadoInicial, funcaoPrograma, estadosFinais)
+    automato.verificaEstadoFinalEInicial()
 
-    print("AFe criado: ")
-    print(f"Σ (alfabeto): {automato.getAlfabeto()}")
-    print(f"Q (estados): {automato.getEstados()}")
-    print(f"δ: (função programa): {automato.getFunPrograma()}")
-    print(f"q0: (estado inicial): {automato.getEstadoInicial()}")
-    print(f"F: (estados finais): {automato.getEstadosFinais()}")
+    print("\n### AFNe criado ###")
+    print(f"Σ (alfabeto): {automato.alfabeto}")
+    print(f"Q (estados): {automato.estados}")
+    print(f"δ: (função programa): {automato.funPrograma}")
+    print(f"q0: (estado inicial): {automato.estadoInicial}")
+    print(f"F: (estados finais): {automato.estadosFinais}")
 
+    print("\n### Calculando Fecho Vazio ###")
     for estado in estados:
         fechoVazio = automato.fechoVazio(estado)
         print(f"O fecho vazio do estado {estado} é: {fechoVazio}")
 
-    print(f"Palavra 'aabb': {automato.verificaPalavra('aabb')}")
-    print(f"Palavra 'a': {automato.verificaPalavra('a')}")
-    print(f"Palavra 'b': {automato.verificaPalavra('b')}")
-    print(f"Palavra '&': {automato.verificaPalavra('&')}")
-    print(f"Palavra 'aba': {automato.verificaPalavra('aba')}")
-    print(f"Palavra 'bbab': {automato.verificaPalavra('bbab')}")
-    print(f"Palavra 'ba': {automato.verificaPalavra('ba')}")
-
+    print("\n### Testes ### \n")
+    sair = True
+    print("Testando palavras. Digite 'sair' para finalizar:\n")
+    while(sair):
+        palavra = input(">>> ")
+        if palavra.lower() == 'sair':
+            break
+        print(f"Palavra '{palavra}': {automato.verificaPalavra(palavra)}")
 
 main()
 
