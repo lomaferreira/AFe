@@ -58,20 +58,20 @@ Palavra 'bbb': True
 ```
 
 ## Colaboradores
-
 <table>
   <tr>
-    <td align="center">
-      <a href="https://github.com/lomaferreira">
+    <td align="center" style="border: none;">
+      <a href="https://github.com/lomaferreira" style="text-decoration: none;">
         <img src="https://github.com/lomaferreira.png" width="90px;" alt="Avatar do Usuário 1"/><br>
         <sub><b>Paloma Santos</b></sub>
       </a>
     </td>
-    <td align="center">
-      <a href="https://github.com/amandaac17">
+    <td align="center" style="border: none;">
+      <a href="https://github.com/amandaac17" style="text-decoration: none;">
         <img src="https://github.com/amandaac17.png" width="90px;" alt="Avatar do Usuário 2"/><br>
         <sub><b>Amanda Cardoso</b></sub>
       </a>
     </td>
   </tr>
 </table>
+
